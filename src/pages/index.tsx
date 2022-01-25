@@ -1,47 +1,17 @@
 /* eslint-disable import/extensions */
-import React from 'react';
+import React, { useState } from 'react';
 import type { NextPage } from 'next';
+import { useRouter } from 'next/router';
 import {
   Box, Button, Text, TextField, Image,
 } from '@skynexui/components';
+import { FiUsers } from 'react-icons/fa';
 import appConfig from '../config.json';
 
 type Props = {
   children: string,
   tag: any
 }
-
-const GlobalStyle = () => (
-  <style global jsx>
-    {`
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      list-style: none;
-    }
-
-    body {
-      font-family: 'Open Sans', sans-serif;
-    }
-    
-    html, body, #__next {
-      min-height: 100vh;
-      display: flex;
-      flex: 1;
-    }
-    
-    #__next {
-      flex: 1;
-    }
-    
-    #__next > * {
-      flex: 1;
-    }
-  `}
-
-  </style>
-);
 
 const Title = ({ children, tag }: Props) => {
   const Tag = tag || 'h1';
@@ -62,101 +32,128 @@ const Title = ({ children, tag }: Props) => {
   );
 };
 
+// const Status = ({ children, tag }: Props) => {
+//   const Tag = tag || 'h1';
+//   return (
+//     <>
+//       <style jsx>
+//         {`
+//       div {
+//         display: flex;
+//         flex-direction: row;
+//         align
+//       }
+//     `}
+//       </style>
+
+//       <Tag>{children}</Tag>
+//     </>
+//   );
+// };
+
 const PaginaInicial: NextPage = () => {
-  const username = 'peas';
+  const [username, setUsername] = useState<string>('');
+  const roteamento = useRouter();
 
   return (
-    <>
-      <GlobalStyle />
+    <Box
+      styleSheet={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        backgroundColor: appConfig.theme.colors.primary[500],
+        backgroundImage: 'url(https://images.unsplash.com/photo-1518432031352-d6fc5c10da5a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1974&q=80)',
+        backgroundRepeat: 'no-repeat',
+        backgroundSize: 'cover',
+        backgroundBlendMode: 'multiply',
+      }}
+    >
       <Box
         styleSheet={{
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'center',
-          backgroundColor: appConfig.theme.colors.primary[500],
-          backgroundImage: 'url(https://virtualbackgrounds.site/wp-content/uploads/2020/08/the-matrix-digital-rain.jpg)',
-          backgroundRepeat: 'no-repeat',
-          backgroundSize: 'cover',
-          backgroundBlendMode: 'multiply',
+          justifyContent: 'space-between',
+          flexDirection: {
+            xs: 'column',
+            sm: 'row',
+          },
+          width: '100%',
+          maxWidth: '700px',
+          borderRadius: '5px',
+          padding: '32px',
+          margin: '16px',
+          boxShadow: '0 2px 10px 0 rgb(0 0 0 / 20%)',
+          backgroundColor: appConfig.theme.colors.neutrals[700],
         }}
       >
+        {/* Formulário */}
+        <Box
+          tag="form"
+          onSubmit={(e: HTMLFormElement) => {
+            e.preventDefault();
+            roteamento.push('/chat');
+          }}
+          styleSheet={{
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            width: { xs: '100%', sm: '50%' },
+            textAlign: 'center',
+            marginBottom: '32px',
+          }}
+        >
+          <Title tag="h2">Boas vindas de volta!</Title>
+          <Text variant="body3" styleSheet={{ marginBottom: '32px', color: appConfig.theme.colors.neutrals[300] }}>
+            {appConfig.name}
+          </Text>
+
+          <TextField
+            value={username || ''}
+            onChange={(e) => setUsername(e.target.value)}
+            fullWidth
+            textFieldColors={{
+              neutral: {
+                textColor: appConfig.theme.colors.neutrals[200],
+                mainColor: appConfig.theme.colors.neutrals[900],
+                mainColorHighlight: appConfig.theme.colors.primary[500],
+                backgroundColor: appConfig.theme.colors.neutrals[800],
+              },
+            }}
+          />
+          <Button
+            type="submit"
+            label="Entrar"
+            fullWidth
+            buttonColors={{
+              contrastColor: appConfig.theme.colors.neutrals['000'],
+              mainColor: appConfig.theme.colors.primary[500],
+              mainColorLight: appConfig.theme.colors.primary[400],
+              mainColorStrong: appConfig.theme.colors.primary[600],
+            }}
+          />
+        </Box>
+        {/* Formulário */}
+
+        {/* Photo Area */}
         <Box
           styleSheet={{
             display: 'flex',
+            flexDirection: 'column',
             alignItems: 'center',
-            justifyContent: 'space-between',
-            flexDirection: {
-              xs: 'column',
-              sm: 'row',
-            },
-            width: '100%',
-            maxWidth: '700px',
-            borderRadius: '5px',
-            padding: '32px',
-            margin: '16px',
-            boxShadow: '0 2px 10px 0 rgb(0 0 0 / 20%)',
-            backgroundColor: appConfig.theme.colors.neutrals[700],
+            maxWidth: '200px',
+            padding: '16px',
+            backgroundColor: appConfig.theme.colors.neutrals[800],
+            border: '1px solid',
+            borderColor: appConfig.theme.colors.neutrals[999],
+            borderRadius: '10px',
+            flex: 1,
+            filter: 'drop-shadow(0 20px 13px rgb(0 0 0 / 0.03)) drop-shadow(0 8px 5px rgb(0 0 0 / 0.08))',
+            minHeight: '240px',
           }}
         >
-          {/* Formulário */}
-          <Box
-            as="form"
-            styleSheet={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              justifyContent: 'center',
-              width: { xs: '100%', sm: '50%' },
-              textAlign: 'center',
-              marginBottom: '32px',
-            }}
-          >
-            <Title tag="h2">Boas vindas de volta!</Title>
-            <Text variant="body3" styleSheet={{ marginBottom: '32px', color: appConfig.theme.colors.neutrals[300] }}>
-              {appConfig.name}
-            </Text>
-
-            <TextField
-              fullWidth
-              textFieldColors={{
-                neutral: {
-                  textColor: appConfig.theme.colors.neutrals[200],
-                  mainColor: appConfig.theme.colors.neutrals[900],
-                  mainColorHighlight: appConfig.theme.colors.primary[500],
-                  backgroundColor: appConfig.theme.colors.neutrals[800],
-                },
-              }}
-            />
-            <Button
-              type="submit"
-              label="Entrar"
-              fullWidth
-              buttonColors={{
-                contrastColor: appConfig.theme.colors.neutrals['000'],
-                mainColor: appConfig.theme.colors.primary[500],
-                mainColorLight: appConfig.theme.colors.primary[400],
-                mainColorStrong: appConfig.theme.colors.primary[600],
-              }}
-            />
-          </Box>
-          {/* Formulário */}
-
-          {/* Photo Area */}
-          <Box
-            styleSheet={{
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              maxWidth: '200px',
-              padding: '16px',
-              backgroundColor: appConfig.theme.colors.neutrals[800],
-              border: '1px solid',
-              borderColor: appConfig.theme.colors.neutrals[999],
-              borderRadius: '10px',
-              flex: 1,
-              minHeight: '240px',
-            }}
-          >
+          {username.length > 2 && (
+          <>
             <Image
               styleSheet={{
                 borderRadius: '50%',
@@ -175,11 +172,12 @@ const PaginaInicial: NextPage = () => {
             >
               {username}
             </Text>
-          </Box>
-          {/* Photo Area */}
+          </>
+          )}
         </Box>
+        {/* Photo Area */}
       </Box>
-    </>
+    </Box>
   );
 };
 
