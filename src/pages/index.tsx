@@ -1,17 +1,13 @@
 /* eslint-disable import/extensions */
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import {
   Box, Button, Text, TextField, Image,
 } from '@skynexui/components';
-import { FiUsers } from 'react-icons/fa';
+import { FaUsers } from 'react-icons/fa';
 import appConfig from '../config.json';
-
-type Props = {
-  children: string,
-  tag: any
-}
+import { DataProps, Props } from '../types/main';
 
 const Title = ({ children, tag }: Props) => {
   const Tag = tag || 'h1';
@@ -32,28 +28,23 @@ const Title = ({ children, tag }: Props) => {
   );
 };
 
-// const Status = ({ children, tag }: Props) => {
-//   const Tag = tag || 'h1';
-//   return (
-//     <>
-//       <style jsx>
-//         {`
-//       div {
-//         display: flex;
-//         flex-direction: row;
-//         align
-//       }
-//     `}
-//       </style>
-
-//       <Tag>{children}</Tag>
-//     </>
-//   );
-// };
-
 const PaginaInicial: NextPage = () => {
   const [username, setUsername] = useState<string>('');
   const roteamento = useRouter();
+  const [data, setData] = useState<DataProps>();
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (username.length < 3) return;
+
+    setLoading(true);
+    fetch(`https://api.github.com/users/${username}`)
+      .then((res) => res.json())
+      .then((dataFromAPI) => {
+        setData(dataFromAPI);
+        setLoading(false);
+      });
+  }, [username]);
 
   return (
     <Box
@@ -62,7 +53,8 @@ const PaginaInicial: NextPage = () => {
         alignItems: 'center',
         justifyContent: 'center',
         backgroundColor: appConfig.theme.colors.primary[500],
-        backgroundImage: 'url(https://images.unsplash.com/photo-1518432031352-d6fc5c10da5a?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=1974&q=80)',
+        // @ts-ignore
+        backgroundImage: 'url(/linux-bg.jpeg)',
         backgroundRepeat: 'no-repeat',
         backgroundSize: 'cover',
         backgroundBlendMode: 'multiply',
@@ -89,6 +81,7 @@ const PaginaInicial: NextPage = () => {
         {/* Formulário */}
         <Box
           tag="form"
+          // @ts-ignore
           onSubmit={(e: HTMLFormElement) => {
             e.preventDefault();
             roteamento.push('/chat');
@@ -112,6 +105,7 @@ const PaginaInicial: NextPage = () => {
             value={username || ''}
             onChange={(e) => setUsername(e.target.value)}
             fullWidth
+            // @ts-ignore
             textFieldColors={{
               neutral: {
                 textColor: appConfig.theme.colors.neutrals[200],
@@ -148,6 +142,7 @@ const PaginaInicial: NextPage = () => {
             borderColor: appConfig.theme.colors.neutrals[999],
             borderRadius: '10px',
             flex: 1,
+            // @ts-ignore
             filter: 'drop-shadow(0 20px 13px rgb(0 0 0 / 0.03)) drop-shadow(0 8px 5px rgb(0 0 0 / 0.08))',
             minHeight: '240px',
           }}
@@ -161,17 +156,60 @@ const PaginaInicial: NextPage = () => {
               }}
               src={`https://github.com/${username}.png`}
             />
-            <Text
-              variant="body4"
+            <Box
               styleSheet={{
-                color: appConfig.theme.colors.neutrals[200],
-                backgroundColor: appConfig.theme.colors.neutrals[900],
-                padding: '3px 10px',
-                borderRadius: '1000px',
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
               }}
             >
-              {username}
-            </Text>
+              {loading && (
+                <Text
+                  variant="body4"
+                  styleSheet={{
+                    color: appConfig.theme.colors.neutrals[200],
+                    backgroundColor: appConfig.theme.colors.neutrals[900],
+                    padding: '3px 10px',
+                    marginRight: '5px',
+                    borderRadius: '1000px',
+                  }}
+                >
+                  Loading...
+                </Text>
+              )}
+
+              {!loading && (
+                <>
+                  <Text
+                    variant="body4"
+                    styleSheet={{
+                      color: appConfig.theme.colors.neutrals[200],
+                      backgroundColor: appConfig.theme.colors.neutrals[900],
+                      padding: '3px 10px',
+                      marginRight: '5px',
+                      borderRadius: '1000px',
+                    }}
+                  >
+                    {username}
+                  </Text>
+
+                  <Text
+                    variant="body4"
+                    styleSheet={{
+                      color: appConfig.theme.colors.neutrals[200],
+                      backgroundColor: appConfig.theme.colors.neutrals[900],
+                      padding: '3px 10px',
+                      borderRadius: '1000px',
+                    }}
+                  >
+                    <FaUsers />
+                    {' '}
+                    {data?.followers}
+                  </Text>
+                </>
+              )}
+            </Box>
           </>
           )}
         </Box>
