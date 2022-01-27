@@ -1,7 +1,13 @@
 export type Props = {
   children: string,
   tag: any
-}
+};
+
+export type MensagemProps = {
+  id: number;
+  de: string;
+  texto: string | undefined;
+};
 
 export type DataProps = {
   avatar_url: string
@@ -36,4 +42,4 @@ export type DataProps = {
   type: string
   updated_at: string
   url: string
-}
+};

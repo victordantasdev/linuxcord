@@ -7,7 +7,7 @@ import {
 } from '@skynexui/components';
 import { FaUsers } from 'react-icons/fa';
 import appConfig from '../config.json';
-import { DataProps, Props } from '../types/main';
+import { DataProps, Props } from '../types/DefaultTypes';
 
 const Title = ({ children, tag }: Props) => {
   const Tag = tag || 'h1';
@@ -54,7 +54,7 @@ const PaginaInicial: NextPage = () => {
         justifyContent: 'center',
         backgroundColor: appConfig.theme.colors.primary[500],
         // @ts-ignore
-        backgroundImage: 'url(/linux-bg.jpeg)',
+        backgroundImage: 'url(/images/linux-bg.jpeg)',
         backgroundRepeat: 'no-repeat',
         backgroundSize: 'cover',
         backgroundBlendMode: 'multiply',
@@ -98,13 +98,14 @@ const PaginaInicial: NextPage = () => {
         >
           <Title tag="h2">Boas vindas de volta!</Title>
           <Text variant="body3" styleSheet={{ marginBottom: '32px', color: appConfig.theme.colors.neutrals[300] }}>
-            {appConfig.name}
+            {`${appConfig.name} - ${appConfig.description}`}
           </Text>
 
           <TextField
             value={username || ''}
             onChange={(e) => setUsername(e.target.value)}
             fullWidth
+            placeholder="Digite seu usuário do GitHub aqui..."
             // @ts-ignore
             textFieldColors={{
               neutral: {
@@ -116,6 +117,7 @@ const PaginaInicial: NextPage = () => {
             }}
           />
           <Button
+            disabled={username.length < 2 && true}
             type="submit"
             label="Entrar"
             fullWidth

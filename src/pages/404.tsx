@@ -11,7 +11,7 @@ const Page404 = () => (
       justifyContent: 'center',
       backgroundColor: appConfig.theme.colors.primary[500],
       // @ts-ignore
-      backgroundImage: 'url(/404.jpeg)',
+      backgroundImage: 'url(/images/404.jpeg)',
       backgroundRepeat: 'no-repeat',
       backgroundSize: 'cover',
       backgroundBlendMode: 'multiply',
