@@ -1,8 +1,15 @@
+/* eslint-disable prefer-destructuring */
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable import/extensions */
-import React, { Dispatch, SetStateAction, useState } from 'react';
+import React, {
+  Dispatch, SetStateAction, useEffect, useState,
+} from 'react';
 import {
   Box, Text, TextField, Image, Button,
 } from '@skynexui/components';
+import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import { GetServerSideProps } from 'next';
+import { useRouter } from 'next/router';
 import appConfig from '../config.json';
 import { MensagemProps } from '../types/DefaultTypes';
 
@@ -25,15 +32,26 @@ const Header = () => (
 );
 
 const MessageList = ({
+  loading,
+  userName,
   mensagens,
+  supabaseClient,
   setListaDeMensagens,
 }: {
-    mensagens: Array<MensagemProps>,
-    setListaDeMensagens: Dispatch<SetStateAction<MensagemProps[]>>
+    loading: boolean,
+    supabaseClient: SupabaseClient,
+    userName: string | string[] | undefined,
+    mensagens: Array<MensagemProps> | any[] | null,
+    setListaDeMensagens: Dispatch<SetStateAction<MensagemProps[] | any[] | null>>
   }) => {
-  const handleRemove = (id: number) => {
-    const newMsg = mensagens.filter((m) => m.id !== id);
-    setListaDeMensagens(newMsg);
+  const handleRemove = async (msgID: number) => {
+    const novasMensagens = mensagens!.filter((m) => m.id !== msgID);
+    setListaDeMensagens(novasMensagens);
+
+    await supabaseClient
+      .from('mensagens')
+      .delete()
+      .match({ id: msgID });
   };
 
   return (
@@ -48,7 +66,57 @@ const MessageList = ({
         marginBottom: '16px',
       }}
     >
-      {mensagens.map((mensagem) => (
+      {loading && (
+        <Text
+          tag="li"
+          styleSheet={{
+            borderRadius: '5px',
+            padding: '6px',
+            marginBottom: '12px',
+            boxShadow: '0 2px 10px 0 rgb(0 0 0 / 20%)',
+            hover: {
+              backgroundColor: appConfig.theme.colors.neutrals[700],
+            },
+          }}
+        >
+          <Box
+            styleSheet={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: '8px',
+            }}
+          >
+            <Box>
+              {/* <Image
+                styleSheet={{
+                  width: '20px',
+                  height: '20px',
+                  borderRadius: '50%',
+                  display: 'inline-block',
+                  marginRight: '8px',
+                }}
+                src=""
+              /> */}
+              {/* <Text tag="strong" /> */}
+              {/* <Text
+                styleSheet={{
+                  fontSize: '10px',
+                  marginLeft: '8px',
+                  color: appConfig.theme.colors.neutrals[300],
+                }}
+                tag="span"
+              >
+                {(new Date().toLocaleDateString())}
+              </Text> */}
+            </Box>
+
+          </Box>
+          LOADING...
+        </Text>
+      )}
+
+      {mensagens!.map((mensagem) => (
         <Text
           key={mensagem.id}
           tag="li"
@@ -78,6 +146,11 @@ const MessageList = ({
                   borderRadius: '50%',
                   display: 'inline-block',
                   marginRight: '8px',
+                  transition: 'all 600ms ease-in-out',
+                  hover: {
+                    // @ts-ignore
+                    transform: 'scale(1.5)',
+                  },
                 }}
                 src={`https://github.com/${mensagem.de}.png`}
               />
@@ -96,16 +169,18 @@ const MessageList = ({
               </Text>
             </Box>
 
-            <Box>
-              <Button
-                size="xs"
-                variant="primary"
-                colorVariant="negative"
-                label="Delete"
-                iconName="FaTrashAlt"
-                onClick={() => handleRemove(mensagem.id)}
-              />
-            </Box>
+            {mensagem.de === userName && (
+              <Box>
+                <Button
+                  size="xs"
+                  variant="primary"
+                  colorVariant="negative"
+                  label="Delete"
+                  iconName="FaTrashAlt"
+                  onClick={() => handleRemove(mensagem.id)}
+                />
+              </Box>
+            )}
           </Box>
           {mensagem.texto}
         </Text>
@@ -114,21 +189,45 @@ const MessageList = ({
   );
 };
 
-const ChatPage = () => {
+const ChatPage = ({
+  SUPABASE_ANON_KEY,
+  SUPABASE_URL,
+}: {
+    SUPABASE_ANON_KEY: string,
+    SUPABASE_URL: string
+  }) => {
   const [mensagem, setMensagem] = useState<string | undefined>();
-  const [listaDeMensagens, setListaDeMensagens] = useState<Array<MensagemProps>>([]);
+  const [listaDeMensagens, setListaDeMensagens] = useState<Array<MensagemProps> | any[] | null>([]);
+  const [loading, setLoading] = useState<boolean>(false);
+  const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const { query } = useRouter();
+
+  useEffect(() => {
+    supabaseClient
+      .from('mensagens')
+      .select('*')
+      .order('id', { ascending: false })
+      .then(({ data }) => {
+        setListaDeMensagens(data);
+      });
+  }, []);
 
   const handleNovaMensagem = (novaMensagem: string | undefined) => {
     const msg = {
-      id: listaDeMensagens.length + 1,
-      de: 'victordantasdev',
+      de: query.username,
       texto: novaMensagem,
     };
 
-    setListaDeMensagens([
-      msg,
-      ...listaDeMensagens,
-    ]);
+    supabaseClient
+      .from('mensagens')
+      .insert([msg])
+      .then(({ data }) => {
+        setLoading(false);
+        setListaDeMensagens([
+          data![0],
+          ...listaDeMensagens as Array<MensagemProps>,
+        ]);
+      });
     setMensagem('');
   };
 
@@ -138,6 +237,7 @@ const ChatPage = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        height: '100vh',
         backgroundColor: appConfig.theme.colors.primary[500],
         // @ts-ignore
         backgroundImage: 'url(/images/linux-bg.jpeg)',
@@ -177,8 +277,11 @@ const ChatPage = () => {
           }}
         >
           <MessageList
+            loading={loading}
             mensagens={listaDeMensagens}
+            supabaseClient={supabaseClient}
             setListaDeMensagens={setListaDeMensagens}
+            userName={query.username}
           />
           <Box
             tag="form"
@@ -194,6 +297,7 @@ const ChatPage = () => {
               onKeyPress={(e) => {
                 if (e.key === 'Enter' && !e.shiftKey) {
                   e.preventDefault();
+                  setLoading(true);
                   handleNovaMensagem(mensagem);
                 }
               }}
@@ -215,6 +319,17 @@ const ChatPage = () => {
       </Box>
     </Box>
   );
+};
+
+export const getServerSideProps: GetServerSideProps = async () => {
+  const { SUPABASE_ANON_KEY, SUPABASE_URL } = process.env;
+
+  return {
+    props: {
+      SUPABASE_ANON_KEY,
+      SUPABASE_URL,
+    },
+  };
 };
 
 export default ChatPage;

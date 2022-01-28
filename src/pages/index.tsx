@@ -52,6 +52,7 @@ const PaginaInicial: NextPage = () => {
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
+        height: '100vh',
         backgroundColor: appConfig.theme.colors.primary[500],
         // @ts-ignore
         backgroundImage: 'url(/images/linux-bg.jpeg)',
@@ -60,6 +61,7 @@ const PaginaInicial: NextPage = () => {
         backgroundBlendMode: 'multiply',
       }}
     >
+
       <Box
         styleSheet={{
           display: 'flex',
@@ -84,7 +86,7 @@ const PaginaInicial: NextPage = () => {
           // @ts-ignore
           onSubmit={(e: HTMLFormElement) => {
             e.preventDefault();
-            roteamento.push('/chat');
+            roteamento.push(`/chat?username=${username}`);
           }}
           styleSheet={{
             display: 'flex',
@@ -150,23 +152,23 @@ const PaginaInicial: NextPage = () => {
           }}
         >
           {username.length > 2 && (
-          <>
-            <Image
-              styleSheet={{
-                borderRadius: '50%',
-                marginBottom: '16px',
-              }}
-              src={`https://github.com/${username}.png`}
-            />
-            <Box
-              styleSheet={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-              }}
-            >
-              {loading && (
+            <>
+              <Image
+                styleSheet={{
+                  borderRadius: '50%',
+                  marginBottom: '16px',
+                }}
+                src={`https://github.com/${username}.png`}
+              />
+              <Box
+                styleSheet={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
+                {loading && (
                 <Text
                   variant="body4"
                   styleSheet={{
@@ -179,9 +181,9 @@ const PaginaInicial: NextPage = () => {
                 >
                   Loading...
                 </Text>
-              )}
+                )}
 
-              {!loading && (
+                {!loading && (
                 <>
                   <Text
                     variant="body4"
@@ -210,9 +212,9 @@ const PaginaInicial: NextPage = () => {
                     {data?.followers}
                   </Text>
                 </>
-              )}
-            </Box>
-          </>
+                )}
+              </Box>
+            </>
           )}
         </Box>
         {/* Photo Area */}

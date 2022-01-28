@@ -2,6 +2,7 @@
 import React from 'react';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
+import { ForkMe } from 'fork-me-corner';
 import appConfig from '../config.json';
 
 const GlobalStyle = () => (
@@ -73,7 +74,12 @@ export default function App({ Component, pageProps }: AppProps) {
       </Head>
 
       <GlobalStyle />
-      <Component {...pageProps} />
+      <div>
+        <ForkMe
+          repo="https://github.com/victordantasdev/aluracord-linux"
+        />
+        <Component {...pageProps} />
+      </div>
     </>
   );
 }

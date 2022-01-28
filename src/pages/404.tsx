@@ -9,6 +9,7 @@ const Page404 = () => (
       display: 'flex',
       alignItems: 'center',
       justifyContent: 'center',
+      height: '100vh',
       backgroundColor: appConfig.theme.colors.primary[500],
       // @ts-ignore
       backgroundImage: 'url(/images/404.jpeg)',
