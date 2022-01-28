@@ -40,7 +40,7 @@ const GlobalStyle = () => (
 export default function App({ Component, pageProps }: AppProps) {
   const { name, description } = appConfig;
   const url = 'http://aluracord-linux.vercel.app/';
-  const image = `${url}images/og_image.png`;
+  const image = 'http://aluracord-linux.vercel.app/images/og_image.png';
 
   return (
     <>
