@@ -12,6 +12,7 @@ import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import appConfig from '../config.json';
 import { MensagemProps } from '../types/DefaultTypes';
+import ButtonSendSticker from '../components/ButtonSendSticker';
 
 const Header = () => (
   <Box styleSheet={{
@@ -34,18 +35,20 @@ const Header = () => (
 const MessageList = ({
   loading,
   userName,
-  mensagens,
   supabaseClient,
+  listaDeMensagens,
   setListaDeMensagens,
 }: {
     loading: boolean,
     supabaseClient: SupabaseClient,
     userName: string | string[] | undefined,
-    mensagens: Array<MensagemProps> | any[] | null,
+    listaDeMensagens: Array<MensagemProps> | any[] | null,
     setListaDeMensagens: Dispatch<SetStateAction<MensagemProps[] | any[] | null>>
   }) => {
+  // const [update, setUpdate] = useState<boolean>(false);
+
   const handleRemove = async (msgID: number) => {
-    const novasMensagens = mensagens!.filter((m) => m.id !== msgID);
+    const novasMensagens = listaDeMensagens!.filter((m) => m.id !== msgID);
     setListaDeMensagens(novasMensagens);
 
     await supabaseClient
@@ -87,36 +90,12 @@ const MessageList = ({
               marginBottom: '8px',
             }}
           >
-            <Box>
-              {/* <Image
-                styleSheet={{
-                  width: '20px',
-                  height: '20px',
-                  borderRadius: '50%',
-                  display: 'inline-block',
-                  marginRight: '8px',
-                }}
-                src=""
-              /> */}
-              {/* <Text tag="strong" /> */}
-              {/* <Text
-                styleSheet={{
-                  fontSize: '10px',
-                  marginLeft: '8px',
-                  color: appConfig.theme.colors.neutrals[300],
-                }}
-                tag="span"
-              >
-                {(new Date().toLocaleDateString())}
-              </Text> */}
-            </Box>
-
+            LOADING...
           </Box>
-          LOADING...
         </Text>
       )}
 
-      {mensagens!.map((mensagem) => (
+      {listaDeMensagens!.map((mensagem: MensagemProps) => (
         <Text
           key={mensagem.id}
           tag="li"
@@ -182,7 +161,11 @@ const MessageList = ({
               </Box>
             )}
           </Box>
-          {mensagem.texto}
+          {mensagem.texto!.startsWith(':sticker:') ? (
+            <Image src={mensagem.texto?.replace(':sticker:', '')} />
+          ) : (
+            mensagem.texto
+          )}
         </Text>
       ))}
     </Box>
@@ -196,21 +179,11 @@ const ChatPage = ({
     SUPABASE_ANON_KEY: string,
     SUPABASE_URL: string
   }) => {
-  const [mensagem, setMensagem] = useState<string | undefined>();
-  const [listaDeMensagens, setListaDeMensagens] = useState<Array<MensagemProps> | any[] | null>([]);
   const [loading, setLoading] = useState<boolean>(false);
+  const [mensagem, setMensagem] = useState<string | undefined>();
   const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const [listaDeMensagens, setListaDeMensagens] = useState<Array<MensagemProps> | any[] | null>([]);
   const { query } = useRouter();
-
-  useEffect(() => {
-    supabaseClient
-      .from('mensagens')
-      .select('*')
-      .order('id', { ascending: false })
-      .then(({ data }) => {
-        setListaDeMensagens(data);
-      });
-  }, []);
 
   const handleNovaMensagem = (novaMensagem: string | undefined) => {
     const msg = {
@@ -221,15 +194,35 @@ const ChatPage = ({
     supabaseClient
       .from('mensagens')
       .insert([msg])
-      .then(({ data }) => {
+      .then(() => {
         setLoading(false);
-        setListaDeMensagens([
-          data![0],
-          ...listaDeMensagens as Array<MensagemProps>,
-        ]);
       });
     setMensagem('');
   };
+
+  const escutaMensagensEmTempoReal = (adicionaMensagem: Function) => {
+    supabaseClient
+      .from('mensagens')
+      .on('INSERT', (resIns) => adicionaMensagem(resIns.new))
+      .subscribe();
+  };
+
+  useEffect(() => {
+    supabaseClient
+      .from('mensagens')
+      .select('*')
+      .order('id', { ascending: false })
+      .then(({ data }) => {
+        setListaDeMensagens(data);
+      });
+
+    escutaMensagensEmTempoReal((novaMensagem: MensagemProps) => {
+      setListaDeMensagens((valorAtualDaLista) => [
+        novaMensagem,
+        ...valorAtualDaLista as Array<MensagemProps>,
+      ]);
+    });
+  }, []);
 
   return (
     <Box
@@ -278,10 +271,10 @@ const ChatPage = ({
         >
           <MessageList
             loading={loading}
-            mensagens={listaDeMensagens}
+            userName={query.username}
+            listaDeMensagens={listaDeMensagens}
             supabaseClient={supabaseClient}
             setListaDeMensagens={setListaDeMensagens}
-            userName={query.username}
           />
           <Box
             tag="form"
@@ -314,6 +307,7 @@ const ChatPage = ({
                 color: appConfig.theme.colors.neutrals[200],
               }}
             />
+            <ButtonSendSticker onStickerClick={(sticker: string) => handleNovaMensagem(`:sticker: ${sticker}`)} />
           </Box>
         </Box>
       </Box>
