@@ -12,7 +12,7 @@ import { GetServerSideProps } from 'next';
 import { useRouter } from 'next/router';
 import appConfig from '../config.json';
 import { MensagemProps } from '../types/DefaultTypes';
-import ButtonSendSticker from '../components/ButtonSendSticker';
+// import ButtonSendSticker from '../components/ButtonSendSticker';
 
 const Header = () => (
   <Box styleSheet={{
@@ -154,8 +154,18 @@ const MessageList = ({
                 }}
                 src={`https://github.com/${mensagem.de}.png`}
               />
-              <Text tag="strong">
-                {mensagem.de}
+              <Text tag="strong" styleSheet={{ }}>
+                <a
+                  href={`https://github.com/${mensagem.de}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  style={{
+                    textDecoration: 'none',
+                    color: appConfig.theme.colors.neutrals[100],
+                  }}
+                >
+                  {mensagem.de}
+                </a>
               </Text>
               <Text
                 styleSheet={{
@@ -175,8 +185,7 @@ const MessageList = ({
                   size="xs"
                   variant="primary"
                   colorVariant="negative"
-                  label="Delete"
-                  iconName="FaTrashAlt"
+                  label="$ rm -rf"
                   onClick={() => handleRemove(mensagem.id)}
                 />
               </Box>
@@ -194,11 +203,11 @@ const MessageList = ({
 };
 
 const ChatPage = ({
-  SUPABASE_ANON_KEY,
   SUPABASE_URL,
+  SUPABASE_ANON_KEY,
 }: {
-    SUPABASE_ANON_KEY: string,
     SUPABASE_URL: string
+    SUPABASE_ANON_KEY: string,
   }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [mensagem, setMensagem] = useState<string | undefined>();
@@ -225,7 +234,7 @@ const ChatPage = ({
     escutaMensagensEmTempoReal é uma função que recebe outra função como parâme-
     tro e quando é chamada executa a função passada por parâmetro
 
-    const f = (x: Function) => x
+    const f = (x: Function) => x();
   */
   const escutaMensagensEmTempoReal = (
     adicionaMensagem: Function,
@@ -284,6 +293,7 @@ const ChatPage = ({
           // @ts-ignore
           maxHeight: '95vh',
           padding: '32px',
+          marginLeft: '16px',
           overflow: 'hidden',
         }}
       >
@@ -359,8 +369,64 @@ const ChatPage = ({
                 }}
               />
             </Box>
-            <ButtonSendSticker onStickerClick={(sticker: string) => handleNovaMensagem(`:sticker: ${sticker}`)} />
+            {/* <ButtonSendSticker
+              onStickerClick={(sticker: string) => handleNovaMensagem(`:sticker: ${sticker}`)}
+            /> */}
           </Box>
+        </Box>
+      </Box>
+
+      <Box
+        styleSheet={{
+          display: 'flex',
+          flexDirection: 'column',
+          boxShadow: '0 2px 10px 0 rgb(0 0 0 / 20%)',
+          borderRadius: '5px',
+          backgroundColor: appConfig.theme.colors.neutrals[700],
+          height: '100%',
+          // @ts-ignore
+          maxHeight: '95vh',
+          padding: '32px',
+          overflow: 'hidden',
+          margin: '0 16px',
+          width: '20%',
+        }}
+      >
+        <Box
+          tag="ul"
+          styleSheet={{
+            display: 'flex',
+            // @ts-ignore
+            flexWrap: 'wrap',
+            justifyContent: 'space-between',
+            flex: 1,
+            paddingTop: '16px',
+            overflow: 'auto',
+          }}
+        >
+          {appConfig.stickers.map((sticker) => (
+            <Text
+                // @ts-ignore
+              onClick={(e) => {
+                handleNovaMensagem(`:sticker: ${e.target.currentSrc}`);
+              }}
+              tag="li"
+              key={sticker}
+              styleSheet={{
+                width: '50%',
+                borderRadius: '5px',
+                padding: '10px',
+                focus: {
+                  backgroundColor: appConfig.theme.colors.neutrals[600],
+                },
+                hover: {
+                  backgroundColor: appConfig.theme.colors.neutrals[600],
+                },
+              }}
+            >
+              <Image src={sticker} />
+            </Text>
+          ))}
         </Box>
       </Box>
     </Box>
@@ -370,10 +436,15 @@ const ChatPage = ({
 export const getServerSideProps: GetServerSideProps = async () => {
   const { SUPABASE_ANON_KEY, SUPABASE_URL } = process.env;
 
+  // const userData = await fetch(`https://api.github.com/users/${ctx.query.username}`)
+  //   .then((res) => res.json())
+  //   .then((data) => data);
+
   return {
     props: {
       SUPABASE_ANON_KEY,
       SUPABASE_URL,
+      // userData,
     },
   };
 };

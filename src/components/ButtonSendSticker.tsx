@@ -5,7 +5,7 @@ import {
 } from '@skynexui/components';
 import appConfig from '../config.json';
 
-const ButtonSendSticker = ({ onStickerClick }: {onStickerClick: any}) => {
+const ButtonSendSticker = ({ onStickerClick }: {onStickerClick: Function}) => {
   const [isOpen, setOpenState] = useState<boolean>(false);
 
   return (
