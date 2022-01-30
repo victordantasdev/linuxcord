@@ -200,10 +200,20 @@ const ChatPage = ({
     setMensagem('');
   };
 
-  const escutaMensagensEmTempoReal = (adicionaMensagem: Function) => {
+  /*
+    escutaMensagensEmTempoReal é uma função que recebe outra função como parâme-
+    tro e quando é chamada executa a função passada por parâmetro
+
+    const f = (x: Function) => x
+  */
+  const escutaMensagensEmTempoReal = (
+    adicionaMensagem: Function,
+    atualizaMensagemDeletada: Function,
+  ) => {
     supabaseClient
       .from('mensagens')
       .on('INSERT', (resIns) => adicionaMensagem(resIns.new))
+      .on('DELETE', (resDel) => atualizaMensagemDeletada(resDel.old.id))
       .subscribe();
   };
 
@@ -221,6 +231,11 @@ const ChatPage = ({
         novaMensagem,
         ...valorAtualDaLista as Array<MensagemProps>,
       ]);
+    }, (id: number) => {
+      setListaDeMensagens((valorAtualDaLista) => {
+        const novasMensagens = valorAtualDaLista!.filter((m) => m.id !== id);
+        return novasMensagens;
+      });
     });
   }, []);
 
