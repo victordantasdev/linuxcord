@@ -2,40 +2,9 @@
 import React from 'react';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
-import { ForkMe } from 'fork-me-corner';
+import NextNProgress from 'nextjs-progressbar';
 import appConfig from '../config.json';
-
-const GlobalStyle = () => (
-  <style global jsx>
-    {`
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      list-style: none;
-    }
-
-    body {
-      font-family: 'Open Sans', sans-serif;
-    }
-    
-    html, body, #__next {
-      min-height: 100vh;
-      display: flex;
-      flex: 1;
-    }
-    
-    #__next {
-      flex: 1;
-    }
-    
-    #__next > * {
-      flex: 1;
-    }
-  `}
-
-  </style>
-);
+import '../styles/global.css';
 
 export default function App({ Component, pageProps }: AppProps) {
   const { name, description } = appConfig;
@@ -47,7 +16,7 @@ export default function App({ Component, pageProps }: AppProps) {
       <Head>
         <link
           rel="icon"
-          href="/images/discord_logo.png"
+          href="/images/tux_logo.png"
         />
         <title>
           {`${name} - ${description}`}
@@ -73,10 +42,10 @@ export default function App({ Component, pageProps }: AppProps) {
         <meta property="twitter:image" content={image} />
       </Head>
 
-      <GlobalStyle />
       <div>
-        <ForkMe
-          repo="https://github.com/victordantasdev/aluracord-linux"
+        <NextNProgress
+          color="#bd93f9"
+          options={{ showSpinner: false }}
         />
         <Component {...pageProps} />
       </div>

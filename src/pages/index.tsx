@@ -5,9 +5,9 @@ import { useRouter } from 'next/router';
 import {
   Box, Button, Text, TextField, Image,
 } from '@skynexui/components';
-import { FaUsers } from 'react-icons/fa';
+import { ForkMe } from 'fork-me-corner';
 import appConfig from '../config.json';
-import { DataProps, Props } from '../types/DefaultTypes';
+import { Props } from '../types/DefaultTypes';
 
 const Title = ({ children, tag }: Props) => {
   const Tag = tag || 'h1';
@@ -30,196 +30,198 @@ const Title = ({ children, tag }: Props) => {
 
 const PaginaInicial: NextPage = () => {
   const [username, setUsername] = useState<string>('');
+  const [time, setTime] = useState<string>(new Date().toLocaleTimeString());
   const roteamento = useRouter();
-  const [data, setData] = useState<DataProps>();
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    if (username.length < 3) return;
-
-    setLoading(true);
-    fetch(`https://api.github.com/users/${username}`)
-      .then((res) => res.json())
-      .then((dataFromAPI) => {
-        setData(dataFromAPI);
-        setLoading(false);
-      });
-  }, [username]);
+    setTimeout(() => {
+      setTime(new Date().toLocaleTimeString());
+    }, 1000);
+  }, [time]);
 
   return (
-    <Box
-      styleSheet={{
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        height: '100vh',
-        backgroundColor: appConfig.theme.colors.primary[500],
-        // @ts-ignore
-        backgroundImage: 'url(/images/linux-bg.jpeg)',
-        backgroundRepeat: 'no-repeat',
-        backgroundSize: 'cover',
-        backgroundBlendMode: 'multiply',
-      }}
-    >
-
+    <>
+      <ForkMe
+        repo="https://github.com/victordantasdev/aluracord-linux"
+      />
       <Box
         styleSheet={{
           display: 'flex',
+          flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'space-between',
-          flexDirection: {
-            xs: 'column',
-            sm: 'row',
-          },
-          width: '100%',
-          maxWidth: '700px',
-          borderRadius: '5px',
-          padding: '32px',
-          margin: '16px',
-          boxShadow: '0 2px 10px 0 rgb(0 0 0 / 20%)',
-          backgroundColor: appConfig.theme.colors.neutrals[700],
+          height: '100vh',
         }}
       >
-        {/* Formulário */}
-        <Box
-          tag="form"
-          // @ts-ignore
-          onSubmit={(e: HTMLFormElement) => {
-            e.preventDefault();
-            roteamento.push(`/chat?username=${username}`);
+        {/* timezone */}
+
+        <Text
+          variant="heading4"
+          styleSheet={{
+            marginTop: '16px',
+            color: appConfig.theme.colors.neutrals[100],
           }}
+        >
+          {time}
+        </Text>
+
+        {/* timezone */}
+
+        {/* login area */}
+        <Box
           styleSheet={{
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             justifyContent: 'center',
-            width: { xs: '100%', sm: '50%' },
-            textAlign: 'center',
-            marginBottom: '32px',
           }}
         >
-          <Title tag="h2">Boas vindas de volta!</Title>
-          <Text variant="body3" styleSheet={{ marginBottom: '32px', color: appConfig.theme.colors.neutrals[300] }}>
-            {`${appConfig.name} - ${appConfig.description}`}
-          </Text>
-
-          <TextField
-            value={username || ''}
-            onChange={(e) => setUsername(e.target.value)}
-            fullWidth
-            placeholder="Digite seu usuário do GitHub aqui..."
-            // @ts-ignore
-            textFieldColors={{
-              neutral: {
-                textColor: appConfig.theme.colors.neutrals[200],
-                mainColor: appConfig.theme.colors.neutrals[900],
-                mainColorHighlight: appConfig.theme.colors.primary[500],
+          <Box>
+            {/* Photo Area */}
+            <Box
+              styleSheet={{
+                width: '200px',
+                height: '200px',
+                padding: '2px',
                 backgroundColor: appConfig.theme.colors.neutrals[800],
-              },
-            }}
-          />
-          <Button
-            disabled={username.length < 2 && true}
-            type="submit"
-            label="Entrar"
-            fullWidth
-            buttonColors={{
-              contrastColor: appConfig.theme.colors.neutrals['000'],
-              mainColor: appConfig.theme.colors.primary[500],
-              mainColorLight: appConfig.theme.colors.primary[400],
-              mainColorStrong: appConfig.theme.colors.primary[600],
-            }}
-          />
-        </Box>
-        {/* Formulário */}
+                border: '1px solid',
+                borderColor: appConfig.theme.colors.neutrals[999],
+                borderRadius: '1000px',
+                flex: 1,
+                // @ts-ignore
+                filter: 'drop-shadow(0 20px 13px rgb(0 0 0 / 0.03)) drop-shadow(0 8px 5px rgb(0 0 0 / 0.08))',
+              }}
+            >
+              {username.length > 2 ? (
+                <Image
+                  styleSheet={{
+                    borderRadius: '50%',
+                    marginBottom: '16px',
+                  }}
+                  src={`https://github.com/${username}.png`}
+                />
+              ) : (
+                <Image
+                  styleSheet={{
+                    borderRadius: '50%',
+                    marginBottom: '16px',
+                  }}
+                  src="/images/user.png"
+                />
+              )}
+            </Box>
+            {/* Photo Area */}
+          </Box>
 
-        {/* Photo Area */}
+          <Box
+            styleSheet={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              flexDirection: {
+                xs: 'column',
+                sm: 'row',
+              },
+              width: '100%',
+              maxWidth: '700px',
+              borderRadius: '5px',
+              padding: '32px',
+              margin: '16px',
+              boxShadow: '0 2px 10px 0 rgb(0 0 0 / 20%)',
+              backgroundColor: appConfig.theme.colors.neutrals[700],
+            }}
+          >
+            {/* Formulário */}
+            <Box
+              tag="form"
+          // @ts-ignore
+              onSubmit={(e: HTMLFormElement) => {
+                e.preventDefault();
+                roteamento.push(`/chat?username=${username}`);
+              }}
+              styleSheet={{
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                width: { xs: '100%', sm: '50%' },
+                textAlign: 'center',
+                marginBottom: '32px',
+              }}
+            >
+              <Title tag="h2">Boas vindas de volta!</Title>
+              <Text variant="body3" styleSheet={{ marginBottom: '32px', color: appConfig.theme.colors.neutrals[300] }}>
+                {`${appConfig.name} - ${appConfig.description}`}
+              </Text>
+
+              <TextField
+                value={username || ''}
+                onChange={(e) => setUsername(e.target.value)}
+                fullWidth
+                placeholder="Digite seu usuário do GitHub aqui..."
+            // @ts-ignore
+                textFieldColors={{
+                  neutral: {
+                    textColor: appConfig.theme.colors.neutrals[200],
+                    mainColor: appConfig.theme.colors.neutrals[900],
+                    mainColorHighlight: appConfig.theme.colors.primary[500],
+                    backgroundColor: appConfig.theme.colors.neutrals[800],
+                  },
+                }}
+              />
+              <Button
+                disabled={username.length < 2 && true}
+                type="submit"
+                label="Entrar"
+                fullWidth
+                buttonColors={{
+                  contrastColor: appConfig.theme.colors.neutrals['000'],
+                  mainColor: appConfig.theme.colors.primary[500],
+                  mainColorLight: appConfig.theme.colors.primary[400],
+                  mainColorStrong: appConfig.theme.colors.primary[600],
+                }}
+              />
+            </Box>
+            {/* Formulário */}
+          </Box>
+        </Box>
+        {/* login area */}
+
+        {/* logo */}
         <Box
           styleSheet={{
             display: 'flex',
-            flexDirection: 'column',
+            flexDirection: 'row',
             alignItems: 'center',
-            maxWidth: '200px',
-            padding: '16px',
-            backgroundColor: appConfig.theme.colors.neutrals[800],
-            border: '1px solid',
-            borderColor: appConfig.theme.colors.neutrals[999],
-            borderRadius: '10px',
-            flex: 1,
-            // @ts-ignore
-            filter: 'drop-shadow(0 20px 13px rgb(0 0 0 / 0.03)) drop-shadow(0 8px 5px rgb(0 0 0 / 0.08))',
-            minHeight: '240px',
+            justifyContent: 'center',
+            marginBottom: '16px',
           }}
         >
-          {username.length > 2 && (
-            <>
-              <Image
-                styleSheet={{
-                  borderRadius: '50%',
-                  marginBottom: '16px',
-                }}
-                src={`https://github.com/${username}.png`}
-              />
-              <Box
-                styleSheet={{
-                  display: 'flex',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}
-              >
-                {loading && (
-                <Text
-                  variant="body4"
-                  styleSheet={{
-                    color: appConfig.theme.colors.neutrals[200],
-                    backgroundColor: appConfig.theme.colors.neutrals[900],
-                    padding: '3px 10px',
-                    marginRight: '5px',
-                    borderRadius: '1000px',
-                  }}
-                >
-                  Loading...
-                </Text>
-                )}
-
-                {!loading && (
-                <>
-                  <Text
-                    variant="body4"
-                    styleSheet={{
-                      color: appConfig.theme.colors.neutrals[200],
-                      backgroundColor: appConfig.theme.colors.neutrals[900],
-                      padding: '3px 10px',
-                      marginRight: '5px',
-                      borderRadius: '1000px',
-                    }}
-                  >
-                    {username}
-                  </Text>
-
-                  <Text
-                    variant="body4"
-                    styleSheet={{
-                      color: appConfig.theme.colors.neutrals[200],
-                      backgroundColor: appConfig.theme.colors.neutrals[900],
-                      padding: '3px 10px',
-                      borderRadius: '1000px',
-                    }}
-                  >
-                    <FaUsers />
-                    {' '}
-                    {data?.followers}
-                  </Text>
-                </>
-                )}
-              </Box>
-            </>
-          )}
+          <Image
+            styleSheet={{
+              width: '100px',
+              height: '100px',
+              borderRadius: '1000px',
+              // @ts-ignore
+              filter: 'drop-shadow(0 20px 13px rgb(0 0 0 / 0.03)) drop-shadow(0 8px 5px rgb(0 0 0 / 0.08))',
+            }}
+            src="/images/tux_logo.png"
+          />
+          <Text
+            variant="heading3"
+            styleSheet={{
+              marginLeft: '16px',
+              color: appConfig.theme.colors.neutrals[100],
+              // @ts-ignore
+              filter: 'drop-shadow(0 20px 13px rgb(0 0 0 / 0.03)) drop-shadow(0 8px 5px rgb(0 0 0 / 0.08))',
+            }}
+          >
+            {appConfig.name}
+          </Text>
         </Box>
-        {/* Photo Area */}
+        {/* logo */}
       </Box>
-    </Box>
+    </>
   );
 };
 

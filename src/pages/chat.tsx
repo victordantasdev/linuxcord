@@ -16,19 +16,28 @@ import ButtonSendSticker from '../components/ButtonSendSticker';
 
 const Header = () => (
   <Box styleSheet={{
-    width: '100%', marginBottom: '16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+    width: '100%',
+    marginBottom: '16px',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    color: appConfig.theme.colors.neutrals[100],
   }}
   >
-    <Text variant="heading5">
+    <Text
+      variant="heading2"
+    >
       Chat
     </Text>
-    <Button
-      variant="tertiary"
-      // @ts-ignore
-      colorVariant="neutral"
-      label="Logout"
-      href="/"
-    />
+    <Box>
+      <Button
+        variant="tertiary"
+        // @ts-ignore
+        colorVariant="neutral"
+        label="Logout"
+        href="/"
+      />
+    </Box>
   </Box>
 );
 
@@ -45,7 +54,7 @@ const MessageList = ({
     listaDeMensagens: Array<MensagemProps> | any[] | null,
     setListaDeMensagens: Dispatch<SetStateAction<MensagemProps[] | any[] | null>>
   }) => {
-  // const [update, setUpdate] = useState<boolean>(false);
+  const { query } = useRouter();
 
   const handleRemove = async (msgID: number) => {
     const novasMensagens = listaDeMensagens!.filter((m) => m.id !== msgID);
@@ -65,8 +74,9 @@ const MessageList = ({
         display: 'flex',
         flexDirection: 'column-reverse',
         flex: 1,
-        color: appConfig.theme.colors.neutrals['000'],
+        padding: '0 16px',
         marginBottom: '16px',
+        color: appConfig.theme.colors.neutrals['000'],
       }}
     >
       {loading && (
@@ -100,7 +110,9 @@ const MessageList = ({
           key={mensagem.id}
           tag="li"
           styleSheet={{
-            borderRadius: '5px',
+            // @ts-ignore
+            alignSelf: query.username === mensagem.de ? 'flex-end' : 'flex-start',
+            borderRadius: query.username === mensagem.de ? '8px 8px 0 8px' : '8px 8px 8px 0',
             padding: '6px',
             marginBottom: '12px',
             boxShadow: '0 2px 10px 0 rgb(0 0 0 / 20%)',
@@ -114,14 +126,23 @@ const MessageList = ({
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'space-between',
+              paddingBottom: '6px',
               marginBottom: '8px',
+              // @ts-ignore
+              borderBottom: `1px solid ${appConfig.theme.colors.neutrals[500]}`,
             }}
           >
-            <Box>
+            <Box
+              styleSheet={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
               <Image
                 styleSheet={{
-                  width: '20px',
-                  height: '20px',
+                  width: '25px',
+                  height: '25px',
                   borderRadius: '50%',
                   display: 'inline-block',
                   marginRight: '8px',
@@ -149,7 +170,7 @@ const MessageList = ({
             </Box>
 
             {mensagem.de === userName && (
-              <Box>
+              <Box styleSheet={{ marginLeft: '16px' }}>
                 <Button
                   size="xs"
                   variant="primary"
@@ -246,13 +267,8 @@ const ChatPage = ({
         alignItems: 'center',
         justifyContent: 'center',
         height: '100vh',
-        backgroundColor: appConfig.theme.colors.primary[500],
         // @ts-ignore
-        backgroundImage: 'url(/images/linux-bg.jpeg)',
-        backgroundRepeat: 'no-repeat',
-        backgroundSize: 'cover',
-        backgroundBlendMode: 'multiply',
-        color: appConfig.theme.colors.neutrals['000'],
+        backdropFilter: 'blur(8px)',
       }}
     >
       <Box
@@ -276,6 +292,8 @@ const ChatPage = ({
           styleSheet={{
             position: 'relative',
             display: 'flex',
+            // alignItems: 'center',
+            justifyContent: 'center',
             flex: 1,
             height: '80%',
             backgroundColor: appConfig.theme.colors.neutrals[600],
@@ -296,32 +314,51 @@ const ChatPage = ({
             styleSheet={{
               display: 'flex',
               alignItems: 'center',
+              justifyContent: 'space-between',
+              paddingTop: '16px',
             }}
           >
-            {/* @ts-ignore */}
-            <TextField
-              value={mensagem}
-              onChange={(e) => setMensagem(e.target.value)}
-              onKeyPress={(e) => {
-                if (e.key === 'Enter' && !e.shiftKey) {
-                  e.preventDefault();
-                  setLoading(true);
-                  handleNovaMensagem(mensagem);
-                }
-              }}
-              placeholder="Insira sua mensagem aqui..."
-              type="textarea"
+            <Box
               styleSheet={{
+                display: 'flex',
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'center',
                 width: '100%',
-                border: '0',
-                resize: 'none',
-                borderRadius: '5px',
-                padding: '6px 8px',
-                backgroundColor: appConfig.theme.colors.neutrals[800],
                 marginRight: '12px',
                 color: appConfig.theme.colors.neutrals[200],
+                backgroundColor: appConfig.theme.colors.neutrals[800],
               }}
-            />
+            >
+              <Text
+                variant="body1"
+                styleSheet={{
+                  margin: '0 16px',
+                }}
+              >
+                $
+              </Text>
+              {/* @ts-ignore */}
+              <TextField
+                value={mensagem}
+                onChange={(e) => {
+                  setMensagem(e.target.value);
+                }}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    setLoading(true);
+                    handleNovaMensagem(mensagem);
+                  }
+                }}
+                placeholder="Insira sua mensagem aqui..."
+                type="textarea"
+                styleSheet={{
+                  width: '100%',
+                  border: 'none',
+                }}
+              />
+            </Box>
             <ButtonSendSticker onStickerClick={(sticker: string) => handleNovaMensagem(`:sticker: ${sticker}`)} />
           </Box>
         </Box>

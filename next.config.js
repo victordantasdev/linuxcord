@@ -9,8 +9,15 @@ module.exports = {
     return [
       {
         source: '/chat',
+        has: [
+          {
+            type: 'query',
+            key: 'username',
+            value: 'home',
+          },
+        ],
+        permanent: false,
         destination: '/',
-        permanent: true,
       },
     ];
   },

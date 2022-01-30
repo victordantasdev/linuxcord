@@ -1,7 +1,6 @@
 /* eslint-disable import/extensions */
-import { Box } from '@skynexui/components';
+import { Box, Image } from '@skynexui/components';
 import React from 'react';
-import appConfig from '../config.json';
 
 const Page404 = () => (
   <Box
@@ -10,14 +9,13 @@ const Page404 = () => (
       alignItems: 'center',
       justifyContent: 'center',
       height: '100vh',
-      backgroundColor: appConfig.theme.colors.primary[500],
-      // @ts-ignore
-      backgroundImage: 'url(/images/404.jpeg)',
-      backgroundRepeat: 'no-repeat',
-      backgroundSize: 'cover',
-      backgroundBlendMode: 'multiply',
+      backgroundColor: '#000',
     }}
-  />
+  >
+    <Image
+      src="/images/404.jpeg"
+    />
+  </Box>
 );
 
 export default Page404;

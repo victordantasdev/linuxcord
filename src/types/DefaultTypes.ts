@@ -9,7 +9,7 @@ export type MensagemProps = {
   texto: string | undefined;
 };
 
-export type DataProps = {
+export type GitHubDataProps = {
   avatar_url: string
   bio: string
   blog: string
