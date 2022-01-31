@@ -14,32 +14,48 @@ import appConfig from '../config.json';
 import { MensagemProps } from '../types/DefaultTypes';
 // import ButtonSendSticker from '../components/ButtonSendSticker';
 
-const Header = () => (
-  <Box styleSheet={{
-    width: '100%',
-    marginBottom: '16px',
-    display: 'flex',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    color: appConfig.theme.colors.neutrals[100],
-  }}
-  >
-    <Text
-      variant="heading2"
+const Header = () => {
+  const router = useRouter();
+  const { query } = useRouter();
+
+  return (
+    <Box styleSheet={{
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      width: '100%',
+      marginBottom: '16px',
+      color: appConfig.theme.colors.neutrals[100],
+    }}
     >
-      Chat
-    </Text>
-    <Box>
-      <Button
-        variant="tertiary"
-        // @ts-ignore
-        colorVariant="neutral"
-        label="Logout"
-        href="/"
-      />
+      <Text
+        variant="heading3"
+      >
+        {`Logado como ${query.username}`}
+      </Text>
+      <button
+        type="button"
+        onClick={() => router.push('/')}
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '32px',
+          height: '32px',
+          border: 'none',
+          borderRadius: '50%',
+          color: '#fff',
+          fontSize: '24px',
+          fontWeight: 'bold',
+          backgroundColor: '#E96E1F',
+          cursor: 'pointer',
+        }}
+      >
+        x
+      </button>
     </Box>
-  </Box>
-);
+  );
+};
 
 const MessageList = ({
   loading,
@@ -120,6 +136,7 @@ const MessageList = ({
               backgroundColor: appConfig.theme.colors.neutrals[700],
             },
           }}
+          data-value={`data-value-${mensagem.id}`}
         >
           <Box
             styleSheet={{
@@ -212,6 +229,7 @@ const ChatPage = ({
   const [loading, setLoading] = useState<boolean>(false);
   const [mensagem, setMensagem] = useState<string | undefined>();
   const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  const [time, setTime] = useState<string>(new Date().toLocaleTimeString());
   const [listaDeMensagens, setListaDeMensagens] = useState<Array<MensagemProps> | any[] | null>([]);
   const { query } = useRouter();
 
@@ -269,12 +287,19 @@ const ChatPage = ({
     });
   }, []);
 
+  useEffect(() => {
+    setTimeout(() => {
+      setTime(new Date().toLocaleTimeString());
+    }, 1000);
+  }, [time]);
+
   return (
     <Box
       styleSheet={{
         display: 'flex',
+        flexDirection: 'column',
         alignItems: 'center',
-        justifyContent: 'center',
+        justifyContent: 'space-between',
         height: '100vh',
         // @ts-ignore
         backdropFilter: 'blur(8px)',
@@ -283,150 +308,172 @@ const ChatPage = ({
       <Box
         styleSheet={{
           display: 'flex',
-          flexDirection: 'column',
-          flex: 1,
-          boxShadow: '0 2px 10px 0 rgb(0 0 0 / 20%)',
-          borderRadius: '5px',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '100%',
+          color: appConfig.theme.colors.neutrals[100],
           backgroundColor: appConfig.theme.colors.neutrals[700],
-          height: '100%',
-          maxWidth: '95%',
-          // @ts-ignore
-          maxHeight: '95vh',
-          padding: '32px',
-          marginLeft: '16px',
-          overflow: 'hidden',
         }}
       >
-        <Header />
-        <Box
-          styleSheet={{
-            position: 'relative',
-            display: 'flex',
-            // alignItems: 'center',
-            justifyContent: 'center',
-            flex: 1,
-            height: '80%',
-            backgroundColor: appConfig.theme.colors.neutrals[600],
-            flexDirection: 'column',
-            borderRadius: '5px',
-            padding: '16px',
-          }}
-        >
-          <MessageList
-            loading={loading}
-            userName={query.username}
-            listaDeMensagens={listaDeMensagens}
-            supabaseClient={supabaseClient}
-            setListaDeMensagens={setListaDeMensagens}
-          />
-          <Box
-            tag="form"
-            styleSheet={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              paddingTop: '16px',
-            }}
-          >
-            <Box
-              styleSheet={{
-                display: 'flex',
-                flexDirection: 'row',
-                alignItems: 'center',
-                justifyContent: 'center',
-                width: '100%',
-                marginRight: '12px',
-                color: appConfig.theme.colors.neutrals[200],
-                backgroundColor: appConfig.theme.colors.neutrals[800],
-              }}
-            >
-              <Text
-                variant="body1"
-                styleSheet={{
-                  margin: '0 16px',
-                }}
-              >
-                $
-              </Text>
-              {/* @ts-ignore */}
-              <TextField
-                value={mensagem}
-                onChange={(e) => {
-                  setMensagem(e.target.value);
-                }}
-                onKeyPress={(e) => {
-                  if (e.key === 'Enter' && !e.shiftKey) {
-                    e.preventDefault();
-                    setLoading(true);
-                    handleNovaMensagem(mensagem);
-                  }
-                }}
-                placeholder="Insira sua mensagem aqui..."
-                type="textarea"
-                styleSheet={{
-                  width: '100%',
-                  border: 'none',
-                }}
-              />
-            </Box>
-            {/* <ButtonSendSticker
-              onStickerClick={(sticker: string) => handleNovaMensagem(`:sticker: ${sticker}`)}
-            /> */}
-          </Box>
-        </Box>
+        <Text variant="heading5">{time}</Text>
       </Box>
 
       <Box
         styleSheet={{
           display: 'flex',
-          flexDirection: 'column',
-          boxShadow: '0 2px 10px 0 rgb(0 0 0 / 20%)',
-          borderRadius: '5px',
-          backgroundColor: appConfig.theme.colors.neutrals[700],
-          height: '100%',
-          // @ts-ignore
-          maxHeight: '95vh',
-          padding: '32px',
-          overflow: 'hidden',
-          margin: '0 16px',
-          width: '20%',
+          alignItems: 'center',
+          justifyContent: 'center',
+          marginBottom: '16px',
         }}
       >
         <Box
-          tag="ul"
           styleSheet={{
             display: 'flex',
-            // @ts-ignore
-            flexWrap: 'wrap',
-            justifyContent: 'space-between',
+            flexDirection: 'column',
             flex: 1,
-            paddingTop: '16px',
-            overflow: 'auto',
+            boxShadow: '0 2px 10px 0 rgb(0 0 0 / 20%)',
+            borderRadius: '5px',
+            backgroundColor: appConfig.theme.colors.neutrals[700],
+            height: '100%',
+            maxWidth: '95%',
+            // @ts-ignore
+            maxHeight: '95vh',
+            padding: '16px',
+            marginLeft: '16px',
+            overflow: 'hidden',
           }}
         >
-          {appConfig.stickers.map((sticker) => (
-            <Text
-                // @ts-ignore
-              onClick={(e) => {
-                handleNovaMensagem(`:sticker: ${e.target.currentSrc}`);
-              }}
-              tag="li"
-              key={sticker}
+          <Header />
+          <Box
+            styleSheet={{
+              position: 'relative',
+              display: 'flex',
+              // alignItems: 'center',
+              justifyContent: 'center',
+              flex: 1,
+              height: '80%',
+              backgroundColor: appConfig.theme.colors.neutrals[600],
+              flexDirection: 'column',
+              borderRadius: '5px',
+              padding: '16px',
+            }}
+          >
+            <MessageList
+              loading={loading}
+              userName={query.username}
+              listaDeMensagens={listaDeMensagens}
+              supabaseClient={supabaseClient}
+              setListaDeMensagens={setListaDeMensagens}
+            />
+            <Box
+              tag="form"
               styleSheet={{
-                width: '50%',
-                borderRadius: '5px',
-                padding: '10px',
-                focus: {
-                  backgroundColor: appConfig.theme.colors.neutrals[600],
-                },
-                hover: {
-                  backgroundColor: appConfig.theme.colors.neutrals[600],
-                },
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                paddingTop: '16px',
               }}
             >
-              <Image src={sticker} />
-            </Text>
-          ))}
+              <Box
+                styleSheet={{
+                  display: 'flex',
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  width: '100%',
+                  marginRight: '12px',
+                  color: appConfig.theme.colors.neutrals[200],
+                  backgroundColor: appConfig.theme.colors.neutrals[800],
+                }}
+              >
+                <Text
+                  variant="body1"
+                  styleSheet={{
+                    margin: '0 16px',
+                  }}
+                >
+                  $
+                </Text>
+                {/* @ts-ignore */}
+                <TextField
+                  value={mensagem}
+                  onChange={(e) => {
+                    setMensagem(e.target.value);
+                  }}
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      setLoading(true);
+                      handleNovaMensagem(mensagem);
+                    }
+                  }}
+                  placeholder="Insira sua mensagem aqui..."
+                  type="textarea"
+                  styleSheet={{
+                    width: '100%',
+                    border: 'none',
+                  }}
+                />
+              </Box>
+              {/* <ButtonSendSticker
+              onStickerClick={(sticker: string) => handleNovaMensagem(`:sticker: ${sticker}`)}
+            /> */}
+            </Box>
+          </Box>
+        </Box>
+
+        <Box
+          styleSheet={{
+            display: 'flex',
+            flexDirection: 'column',
+            boxShadow: '0 2px 10px 0 rgb(0 0 0 / 20%)',
+            borderRadius: '5px',
+            backgroundColor: appConfig.theme.colors.neutrals[700],
+            height: '100%',
+            // @ts-ignore
+            maxHeight: '95vh',
+            padding: '16px',
+            overflow: 'hidden',
+            margin: '0 16px',
+            width: '20%',
+          }}
+        >
+          <Box
+            tag="ul"
+            styleSheet={{
+              display: 'flex',
+              // @ts-ignore
+              flexWrap: 'wrap',
+              justifyContent: 'space-between',
+              flex: 1,
+              paddingTop: '16px',
+              overflow: 'auto',
+            }}
+          >
+            {appConfig.stickers.map((sticker) => (
+              <Text
+                // @ts-ignore
+                onClick={(e) => {
+                  handleNovaMensagem(`:sticker: ${e.target.currentSrc}`);
+                }}
+                tag="li"
+                key={sticker}
+                styleSheet={{
+                  width: '50%',
+                  borderRadius: '5px',
+                  padding: '10px',
+                  focus: {
+                    backgroundColor: appConfig.theme.colors.neutrals[600],
+                  },
+                  hover: {
+                    backgroundColor: appConfig.theme.colors.neutrals[600],
+                  },
+                }}
+              >
+                <Image src={sticker} />
+              </Text>
+            ))}
+          </Box>
         </Box>
       </Box>
     </Box>
